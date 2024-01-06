@@ -30,7 +30,9 @@ LargeSet *grow_set(SmallSet *small) {
 	// Hardcoded index order instead of acually having a balanced tree
 	static_assert(SmallSet::MAX_SIZE == 15);
 	std::sort(std::begin(local_copy.buffer), std::end(local_copy.buffer));
-	static constexpr size_t INDICIES[] = {7, 3, 1, 0, 2, 5, 4, 6, 11, 9, 8, 10, 13, 12, 14};
+	large->root = std::make_unique<int>(local_copy.buffer[7]);
+
+	static constexpr size_t INDICIES[] = {3, 1, 0, 2, 5, 4, 6, 11, 9, 8, 10, 13, 12, 14};
 	for (size_t i : INDICIES) {
 		large->insert(local_copy.buffer[i]);
 	}
@@ -85,7 +87,7 @@ bool SmallSet::remove(int n) {
 }
 
 bool SmallSet::contains(int n) {
-	return this->find(n) == SIZE_MAX;
+	return this->find(n) != SIZE_MAX;
 }
 
 Tuple<SetNode *, SetNode *> LargeSet::find(int n) {
