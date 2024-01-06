@@ -25,8 +25,8 @@ public:
 class SmallSet : public Set {
 	static constexpr size_t MAX_SIZE = 15;
 
-	int buffer[MAX_SIZE];
 	size_t nums = 0;
+	int buffer[MAX_SIZE];
 
 	friend class Set;
 	friend class LargeSet;
