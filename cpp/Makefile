@@ -28,6 +28,9 @@ CXXFLAGS := \
 	-Werror=sign-conversion \
 	-Werror=float-conversion
 
+run: Set
+	./Set
+
 Set: Set.o
 	$(CXX) $(LDFLAGS) $< -o $@
 
