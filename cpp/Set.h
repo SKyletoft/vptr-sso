@@ -51,7 +51,6 @@ struct SetNode {
 
 class alignas(alignof(SmallSet)) LargeSet : public Set {
 	Box<SetNode> root = nullptr;
-	// char _padding[sizeof(SmallSet) - sizeof(Box<SetNode>) - sizeof(size_t)];
 
 	friend class Set;
 	friend class SmallSet;
