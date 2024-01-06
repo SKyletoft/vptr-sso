@@ -8,16 +8,6 @@
 
 #include "Set.h"
 
-static int depth(SetNode *node) {
-	if (node == nullptr) {
-		return 0;
-	}
-	return 1 + std::max(
-		depth(node->left.get()),
-		depth(node->right.get())
-	);
-}
-
 // Convert a Smallset to a LargeSet in place
 LargeSet *grow_set(SmallSet *small) {
 	SmallSet local_copy = *small;
