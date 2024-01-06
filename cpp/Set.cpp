@@ -126,13 +126,31 @@ bool LargeSet::remove(int n) {
 		return false;
 	}
 
-	std::function<void(SetNode *)> remove_node;
-	remove_node = [=](SetNode *next){
+	Box<SetNode> &parent_ref = parent->left.get() == node
+		? parent->left
+		: parent->right;
 
-	};
-
-	if (depth(node->left.get()) > depth(node->right.get())) {
-
+	int combined = ((node->left == nullptr) << 1) | (node->right == nullptr);
+	switch (combined) {
+	case 0b00: {
+		parent_ref = nullptr;
+	} break;
+	case 0b01: {
+		std::swap(parent_ref, node->right);
+	} break;
+	case 0b10: {
+		std::swap(parent_ref, node->left);
+	} break;
+	case 0b11: {
+		SetNode *replace_with = node->right.get();
+		SetNode *parent_of = parent_ref.get();
+		while (replace_with->left.get() != nullptr) {
+			parent_of = replace_with;
+			replace_with = replace_with->left.get();
+		}
+		node->val = replace_with->val;
+		parent_of->left = nullptr;
+	} break;
 	}
 
 	return true;
