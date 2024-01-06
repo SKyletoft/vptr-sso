@@ -14,15 +14,18 @@
 					gnumake
 					clang-tools
 				];
+				java-env = with pkgs; [
+					jdk21
+					jdt-language-server
+				];
 				dbg-env = with pkgs; [
-					nodejs
 					gdb
 					valgrind
 				];
 
 			in rec {
 				devShells.default = pkgs.mkShell {
-					nativeBuildInputs = cpp-env ++ dbg-env;
+					nativeBuildInputs = cpp-env ++ java-env ++ dbg-env;
 				};
 			}
 		);
