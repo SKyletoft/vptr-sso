@@ -163,16 +163,35 @@ bool LargeSet::contains(int n) {
 	return res->val == n;
 }
 
+void inorder(SetNode* root) {
+	if (root != nullptr) {
+		inorder(root->left.get());
+		printf("%d ", root->val);
+		inorder(root->right.get());
+	}
+}
+
 int main() {
 	auto set = Set::new_boxed();
-	for (int i = 0; i < 1024; i++) {
+	for (int i : {5, 3, 7, 2, 5, 4, 6, 8}) {
 		set->insert(i);
 	}
 
-	std::printf("Hi\n");
+	{
+		SmallSet &small_set = dynamic_cast<SmallSet &>(*set);
+		for (auto i : small_set.buffer) {
+			std::printf("%d, ", i);
+		}
+		std::printf(" Total size: %ld\n", small_set.nums);
+	}
 
-	// for (int i : set) {
-	//	std::printf("%d, ", i);
-	// }
-	// std::puts("");
+	for (int i = 0; i < 20; ++i) {
+		set->insert(i);
+	}
+
+	{
+		LargeSet &large_set = dynamic_cast<LargeSet &>(*set);
+		inorder(large_set.root.get());
+		std::puts("");
+	}
 }

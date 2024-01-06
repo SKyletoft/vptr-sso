@@ -32,6 +32,8 @@ class SmallSet : public Set {
 	friend class LargeSet;
 	friend LargeSet *grow_set(SmallSet*);
 
+	friend int main();
+
 	size_t find(int);
 
 	SmallSet() {}
@@ -55,6 +57,8 @@ class alignas(alignof(SmallSet)) LargeSet : public Set {
 	friend class Set;
 	friend class SmallSet;
 	friend LargeSet *grow_set(SmallSet*);
+
+	friend int main();
 
 	Tuple<SetNode *, SetNode *> find(int);
 	LargeSet() {}
