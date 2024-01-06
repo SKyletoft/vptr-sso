@@ -32,7 +32,7 @@ run: Set
 	./Set
 
 Set: Set.o
-	$(CXX) $(LDFLAGS) $< -o $@
+	$(CXX) $(LDFLAGS) $(OPT_LEVEL) $< -o $@
 
 %.o: %.cpp %.h
 	$(CXX) $(CPPFLAGS) $(OPT_LEVEL) $(CXXFLAGS) -c -o $@ $<
