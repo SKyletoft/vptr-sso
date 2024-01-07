@@ -1,5 +1,5 @@
 run: Set.class
-	java -cp . Set
+	java -ea -cp . Set
 
 Set.class: Set.java
 	javac -g Set.java
