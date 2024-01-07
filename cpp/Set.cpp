@@ -9,7 +9,7 @@
 #include "Set.h"
 
 // Convert a Smallset to a LargeSet in place
-LargeSet *grow_set(SmallSet *small) {
+auto grow_set(SmallSet *small) -> LargeSet * {
 	SmallSet local_copy = *small;
 
 	small->~SmallSet();
@@ -20,7 +20,10 @@ LargeSet *grow_set(SmallSet *small) {
 	// Hardcoded index order instead of acually having a balanced tree
 	static_assert(SmallSet::MAX_SIZE == 15);
 	std::sort(std::begin(local_copy.buffer), std::end(local_copy.buffer));
-	large->root = std::make_unique<SetNode>(local_copy.buffer[7]);
+	large->root =
+		std::make_unique<SetNode>(SetNode {
+			.val = local_copy.buffer[7]
+		});
 
 	static constexpr size_t INDICIES[] = {3, 1, 0, 2, 5, 4, 6, 11, 9, 8, 10, 13, 12, 14};
 	for (size_t i : INDICIES) {
@@ -30,11 +33,11 @@ LargeSet *grow_set(SmallSet *small) {
 	return large;
 }
 
-Box<Set> Set::new_boxed() {
+auto Set::new_boxed() -> Box<Set> {
 	return std::make_unique<SmallSet>(SmallSet {});
 }
 
-size_t SmallSet::find(int n) {
+auto SmallSet::find(int n) -> size_t {
 	size_t i;
 	// size_t is unsigned, so can't check against 0. Underflow is well defined as of recently
 	for (i = this->nums-1; i < this->nums; i--) {
@@ -50,7 +53,7 @@ size_t SmallSet::find(int n) {
 	return i;
 }
 
-bool SmallSet::insert(int n) {
+auto SmallSet::insert(int n) -> bool {
 	if (this->contains(n)) {
 		return false;
 	}
@@ -63,7 +66,7 @@ bool SmallSet::insert(int n) {
 	return true;
 }
 
-bool SmallSet::remove(int n) {
+auto SmallSet::remove(int n) -> bool {
 	size_t i = this->find(n);
 
 	if (i == SIZE_MAX) {
@@ -76,18 +79,22 @@ bool SmallSet::remove(int n) {
 	return true;
 }
 
-bool SmallSet::contains(int n) {
+auto SmallSet::contains(int n) -> bool {
 	return this->find(n) != SIZE_MAX;
 }
 
-Tuple<SetNode *, SetNode *> LargeSet::find(int n) {
+auto SmallSet::size() -> size_t {
+	return this->nums;
+}
+
+auto LargeSet::find(int n) -> Tuple<SetNode *, SetNode *> {
 	SetNode *node = this->root.get();
 	SetNode *parent = nullptr;
 	for (;;) {
 		if (node->val == n) {
 			break;
 		}
-		SetNode *next = (node->val < n)
+		SetNode *next = (node->val > n)
 			? node->left.get()
 			: node->right.get();
 		if (next == nullptr) {
@@ -99,19 +106,23 @@ Tuple<SetNode *, SetNode *> LargeSet::find(int n) {
 	return {parent, node};
 }
 
-bool LargeSet::insert(int n) {
+auto LargeSet::insert(int n) -> bool {
 	auto [_, node] = this->find(n);
-	int val = node->val;
-	if (val == n) {
+	if (node->val > n) {
+		assert(node->left == nullptr);
+		node->left = std::make_unique<SetNode>(n);
+		return true;
+	} else if (node->val < n) {
+		assert(node->right == nullptr);
+		node->right = std::make_unique<SetNode>(n);
+		return true;
+	} else {
+		assert(node->val == n);
 		return false;
 	}
-
-	((n < val) ? node->left : node->right) = std::make_unique<SetNode>(n);
-
-	return true;
 }
 
-bool LargeSet::remove(int n) {
+auto LargeSet::remove(int n) -> bool {
 	auto [parent, node] = this->find(n);
 
 	if (node->val != n) {
@@ -148,12 +159,25 @@ bool LargeSet::remove(int n) {
 	return true;
 }
 
-bool LargeSet::contains(int n) {
+auto LargeSet::contains(int n) -> bool {
 	auto [_, res] = this->find(n);
 	return res->val == n;
 }
 
-void inorder(SetNode* root) {
+auto LargeSet::size() -> size_t {
+	std::function<size_t(SetNode *)> f;
+	f = [&](SetNode *node) -> size_t {
+		if (node == nullptr) {
+			return 0;
+		} else {
+			return 1 + f(node->left.get()) + f(node->right.get());
+		}
+	};
+
+	return f(this->root.get());
+}
+
+auto inorder(SetNode* root) -> void {
 	if (root != nullptr) {
 		inorder(root->left.get());
 		printf("%d ", root->val);
@@ -161,7 +185,7 @@ void inorder(SetNode* root) {
 	}
 }
 
-int main() {
+auto main() -> int {
 	auto set = Set::new_boxed();
 	for (int i : {5, 3, 7, 2, 5, 4, 6, 8}) {
 		set->insert(i);
@@ -172,7 +196,7 @@ int main() {
 		for (auto i : small_set.buffer) {
 			std::printf("%d, ", i);
 		}
-		std::printf(" Total size: %ld\n", small_set.nums);
+		std::printf(" Total size: %ld\n", small_set.size());
 	}
 
 	for (int i = 0; i < 20; ++i) {
@@ -182,6 +206,6 @@ int main() {
 	{
 		LargeSet &large_set = dynamic_cast<LargeSet &>(*set);
 		inorder(large_set.root.get());
-		std::puts("");
+		std::printf("Total size: %ld\n", large_set.size());
 	}
 }

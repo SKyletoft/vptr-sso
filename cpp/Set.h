@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <memory>
 #include <tuple>
 
@@ -14,9 +15,10 @@ LargeSet *grow_set(SmallSet *small);
 // Note: Value-based. No references to contained objects available
 class Set {
 public:
-	virtual bool insert(int)   = 0;
-	virtual bool remove(int)   = 0;
-	virtual bool contains(int) = 0;
+	virtual bool   insert(int)   = 0;
+	virtual bool   remove(int)   = 0;
+	virtual bool   contains(int) = 0;
+	virtual size_t size()        = 0;
 	virtual ~Set() {}
 
 	static Box<Set> new_boxed();
@@ -38,9 +40,10 @@ class SmallSet : public Set {
 
 	SmallSet() {}
 public:
-	virtual bool insert(int)   override;
-	virtual bool remove(int)   override;
-	virtual bool contains(int) override;
+	virtual bool   insert(int)   override;
+	virtual bool   remove(int)   override;
+	virtual bool   contains(int) override;
+	virtual size_t size()        override;
 };
 
 struct SetNode {
@@ -48,7 +51,12 @@ struct SetNode {
 	Box<SetNode> left = nullptr;
 	Box<SetNode> right = nullptr;
 
-	SetNode(int n) : val(n) {}
+	// SetNode(int n) : val(n) {}
+	// SetNode(int n, Box<SetNode> l, Box<SetNode> r)
+	//	: val(n)
+	//	, left(std::move(l))
+	//	, right(std::move(r))
+	// {}
 };
 
 class alignas(alignof(SmallSet)) LargeSet : public Set {
@@ -63,9 +71,10 @@ class alignas(alignof(SmallSet)) LargeSet : public Set {
 	Tuple<SetNode *, SetNode *> find(int);
 	LargeSet() {}
 public:
-	virtual bool insert(int)   override;
-	virtual bool remove(int)   override;
-	virtual bool contains(int) override;
+	virtual bool   insert(int)   override;
+	virtual bool   remove(int)   override;
+	virtual bool   contains(int) override;
+	virtual size_t size()        override;
 };
 
 static_assert(sizeof(SmallSet) >= sizeof(LargeSet));
