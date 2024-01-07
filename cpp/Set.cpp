@@ -206,14 +206,6 @@ auto LargeSet::to_string() -> std::string {
 	return ret;
 }
 
-auto inorder(SetNode* root) -> void {
-	if (root != nullptr) {
-		inorder(root->left.get());
-		printf("%d ", root->val);
-		inorder(root->right.get());
-	}
-}
-
 auto main() -> int {
 	auto set = Set::new_boxed();
 	for (int i : {5, 3, 7, 2, 5, 4, 6, 8}) {
