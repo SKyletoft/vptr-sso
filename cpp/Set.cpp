@@ -1,10 +1,10 @@
 #include <cstddef>
-#include <cstdint>
 #include <cstdio>
 #include <cassert>
 
 #include <functional>
-#include <memory>
+#include <iostream>
+#include <sstream>
 
 #include "Set.h"
 
@@ -85,6 +85,17 @@ auto SmallSet::contains(int n) -> bool {
 
 auto SmallSet::size() -> size_t {
 	return this->nums;
+}
+
+auto SmallSet::to_string() -> std::string {
+	std::ostringstream s;
+	for (size_t i = 0; i < this->nums; ++i) {
+		s << this->buffer[i] << ", ";
+	}
+	std::string ret = s.str();
+	ret.pop_back();
+	ret.pop_back();
+	return ret;
 }
 
 auto LargeSet::find(int n) -> Tuple<SetNode *, SetNode *> {
@@ -177,6 +188,24 @@ auto LargeSet::size() -> size_t {
 	return f(this->root.get());
 }
 
+auto LargeSet::to_string() -> std::string {
+	std::ostringstream s {};
+	std::function<void(SetNode *)> f;
+	f = [&](SetNode *node) {
+		if (node != nullptr) {
+			f(node->left.get());
+			s << node->val << ", ";
+			f(node->right.get());
+		}
+	};
+
+	f(this->root.get());
+	std::string ret = s.str();
+	ret.pop_back();
+	ret.pop_back();
+	return ret;
+}
+
 auto inorder(SetNode* root) -> void {
 	if (root != nullptr) {
 		inorder(root->left.get());
@@ -193,10 +222,7 @@ auto main() -> int {
 
 	{
 		SmallSet &small_set = dynamic_cast<SmallSet &>(*set);
-		for (auto i : small_set.buffer) {
-			std::printf("%d, ", i);
-		}
-		std::printf(" Total size: %ld\n", small_set.size());
+		std::cout << "Content: {" << small_set.to_string() << "} | Total size: " << small_set.size() << '\n';
 	}
 
 	for (int i = 0; i < 20; ++i) {
@@ -205,7 +231,6 @@ auto main() -> int {
 
 	{
 		LargeSet &large_set = dynamic_cast<LargeSet &>(*set);
-		inorder(large_set.root.get());
-		std::printf("Total size: %ld\n", large_set.size());
+		std::cout << "Content: {" << large_set.to_string() << "} | Total size: " << large_set.size() << '\n';
 	}
 }
