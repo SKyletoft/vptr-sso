@@ -50,13 +50,6 @@ struct SetNode {
 	int val;
 	Box<SetNode> left = nullptr;
 	Box<SetNode> right = nullptr;
-
-	// SetNode(int n) : val(n) {}
-	// SetNode(int n, Box<SetNode> l, Box<SetNode> r)
-	//	: val(n)
-	//	, left(std::move(l))
-	//	, right(std::move(r))
-	// {}
 };
 
 class alignas(alignof(SmallSet)) LargeSet : public Set {
