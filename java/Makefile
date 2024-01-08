@@ -1,8 +1,8 @@
 run: Set.class
 	java -ea -cp . Set
 
-Set.class: Set.java
-	javac -g Set.java
+%.class: %.java
+	javac -g $<
 
 clean:
 	-rm *.class
